@@ -25,6 +25,26 @@ class ClassifierTests(unittest.TestCase):
 
 
 class EndToEndTests(unittest.TestCase):
+    def test_duplicate_paths_with_different_query_parameters(self):
+        # Same path/filename with different parameter sets must sort without
+        # comparing dictionary records, in BOTH text and HTML tree outputs.
+        urls = "\n".join([
+            "https://example.test/items/view.action?id=101",
+            "https://example.test/items/view.action?search=test",
+            "https://example.test/items/view.action?id=102&mode=edit",
+        ])
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            input_file = root / "crawl.txt"
+            input_file.write_text(urls + "\n", encoding="utf-8")
+            stats = analyze(input_file, root / "output")
+            self.assertEqual(stats["endpoint_signatures"], 3)
+            tree = (root / "output" / "url_tree.txt").read_text()
+            page = (root / "output" / "url_explorer.html").read_text()
+            for params in ("?id", "?search", "?id, mode"):
+                self.assertIn(params, tree)
+                self.assertIn(params, page)
+
     def test_exports_and_html_escaping(self):
         urls = "\n".join([
             "https://example.test/admin/users/edit.action?id=12&token=SECRET_DO_NOT_INCLUDE",
