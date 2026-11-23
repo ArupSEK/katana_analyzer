@@ -1,0 +1,12 @@
+# Crawl data may contain access tokens, internal URLs or sensitive values.
+devdolphin_katana
+*_katana
+katana_results/
+katana_visual_results/
+*.csv
+*.html
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.DS_Store
