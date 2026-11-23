@@ -129,7 +129,7 @@ def text_tree(sites: dict) -> str:
 
     def walk(node: dict, prefix: str = "") -> None:
         entries = [("folder", name, child) for name, child in sorted(node["folders"].items())]
-        entries.extend(("page", name, data) for name, data in sorted(node["pages"]))
+        entries.extend(("page", name, data) for name, data in sorted(node["pages"], key=lambda entry: (entry[0], entry[1]["params"])))
         for index, (kind, name, value) in enumerate(entries):
             last = index == len(entries) - 1
             connector = "└── " if last else "├── "
@@ -155,7 +155,7 @@ def render_html(sites: dict, rows: list[dict]) -> str:
             opened = " open" if depth == 0 else ""
             parts.append(f'<details class="folder"{opened}><summary>📁 {esc(name)}/</summary>'
                          + render(child, depth + 1) + "</details>")
-        for leaf, item in sorted(node["pages"]):
+        for leaf, item in sorted(node["pages"], key=lambda entry: (entry[0], entry[1]["params"])):
             tags = ", ".join(item["tags"]) or "Uncategorized"
             search = " ".join((item["host"], item["path"], *item["params"], *item["tags"])).lower()
             parts.append(
